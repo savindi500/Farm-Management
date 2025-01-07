@@ -33,7 +33,5 @@ Authentication: JWT (JSON Web Tokens)
 
 
 screenshots 
-![alt text](<Screenshot 2025-01-07 165203.png>)
-![alt text](<Screenshot 2025-01-07 165027.png>)
-![alt text](<Screenshot 2025-01-07 165106.png>)
-![alt text](<Screenshot 2025-01-07 165124.png>)
+![Screenshot 2025-01-07 165203](https://github.com/user-attachments/assets/db643652-bb2a-4ca1-97a9-92c38ccf7284)
+
