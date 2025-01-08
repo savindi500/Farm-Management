@@ -34,7 +34,6 @@ Authentication: JWT (JSON Web Tokens)
 
 screenshots 
 ![Screenshot 2025-01-08 203233](https://github.com/user-attachments/assets/3f0505df-7026-4234-88a6-c0339b1033d7)
-![Screenshot 2025-01-08 203331](https://github.com/user-attachments/assets/2d25b5f3-f86c-4e69-b97a-6b678e871938)
 ![Screenshot 2025-01-08 203331](https://github.com/user-attachments/assets/ef1c3545-1c6a-4040-af77-3d2dab700b67)
 ![Screenshot 2025-01-08 203401](https://github.com/user-attachments/assets/8eeb918f-3abf-4f13-922d-15e61e927787)
 ![Screenshot 2025-01-08 203423](https://github.com/user-attachments/assets/b8bdebf5-f9c0-4e34-90c7-97b5068c7afb)
