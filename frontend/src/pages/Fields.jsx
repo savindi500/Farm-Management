@@ -3,6 +3,9 @@ import axios from "axios";
 import {
   Box,
   Button,
+  Grid,
+  TextField,
+  Typography,
   Table,
   TableBody,
   TableCell,
@@ -11,11 +14,11 @@ import {
   TableRow,
   Paper,
   IconButton,
-  Typography,
-  Grid,
   Modal,
-  TextField,
-  MenuItem,
+  Card,
+  CardContent,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 
@@ -30,17 +33,14 @@ const Fields = () => {
   });
 
   const [fieldsData, setFieldsData] = useState([]);
-  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  const [assignData, setAssignData] = useState({
-    date: "",
-    fieldID: "",
-    staffMember: "",
-  });
-  const [staffMembers, setStaffMembers] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   useEffect(() => {
     fetchFields();
-    fetchStaffMembers();
   }, []);
 
   const fetchFields = async () => {
@@ -52,32 +52,27 @@ const Fields = () => {
     }
   };
 
-  const fetchStaffMembers = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/api/staffs");
-      setStaffMembers(response.data);
-    } catch (error) {
-      console.error("Error fetching staff data", error);
-    }
-  };
-
   const handleRegister = async () => {
     try {
       const response = await axios.post("http://localhost:5000/api/fields", formData);
       setFieldsData([...fieldsData, response.data]);
       resetForm();
+      showSnackbar("Field added successfully!", "success");
     } catch (error) {
       console.error("Error registering field", error);
+      showSnackbar("Error adding field!", "error");
     }
   };
 
   const handleUpdate = async () => {
     try {
       const response = await axios.put(`http://localhost:5000/api/fields/${formData.fieldID}`, formData);
-      setFieldsData(fieldsData.map(field => field.fieldID === formData.fieldID ? response.data : field));
+      setFieldsData(fieldsData.map((field) => (field.fieldID === formData.fieldID ? response.data : field)));
       resetForm();
+      showSnackbar("Field updated successfully!", "success");
     } catch (error) {
       console.error("Error updating field:", error);
+      showSnackbar("Error updating field!", "error");
     }
   };
 
@@ -85,18 +80,22 @@ const Fields = () => {
     try {
       await axios.delete(`http://localhost:5000/api/fields/${id}`);
       setFieldsData(fieldsData.filter((field) => field._id !== id));
+      showSnackbar("Field deleted successfully!", "success");
     } catch (error) {
       console.error("Error deleting field:", error);
+      showSnackbar("Error deleting field!", "error");
     }
+  };
+
+  const showSnackbar = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-  };
-
-  const handleEdit = (field) => {
-    setFormData({ ...field });
   };
 
   const resetForm = () => {
@@ -110,188 +109,152 @@ const Fields = () => {
     });
   };
 
-  const handleAssign = async () => {
-    try {
-      await axios.post("http://localhost:5000/api/assign", assignData);
-      setIsAssignModalOpen(false);
-      setAssignData({ date: "", fieldID: "", staffMember: "" });
-    } catch (error) {
-      console.error("Error assigning staff member", error);
-    }
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
+  const handleImageClick = (image) => {
+    setSelectedImage(image);
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setSelectedImage(null);
   };
 
   return (
-    <div className="min-h-screen ">
-      <Box p={4}>
-        <Typography variant="h5" mb={3} fontWeight="bold">
-          Field Management
-        </Typography>
+    <Box className="min-h-screen" p={4}>
+      <h2 className="text-2xl font-bold text-center mb-6">Field Management</h2>
 
-        <Box component="form" mb={4}>
-          <Grid container spacing={2}>
-            {[
-              { label: "Field ID", name: "fieldID", type: "text", placeholder: "Field ID" },
-              { label: "Field Name", name: "fieldName", type: "text", placeholder: "Field Name" },
-              { label: "X Coordinate", name: "xCoordinate", type: "number", placeholder: "X Coordinate" },
-              { label: "Y Coordinate", name: "yCoordinate", type: "number", placeholder: "Y Coordinate" },
-              { label: "Field Size", name: "size", type: "number", placeholder: "Field Size" },
-              { label: "Image URL", name: "images", type: "text", placeholder: "Image URL" },
-            ].map((field) => (
-              <Grid item xs={12} sm={6} key={field.name}>
-                <label style={{ display: "block", marginBottom: "8px" }}>{field.label}</label>
-                <input
-                  type={field.type}
-                  name={field.name}
-                  value={formData[field.name]}
+      <Card>
+        <CardContent>
+          <Grid container spacing={3}>
+            {["fieldID", "fieldName", "xCoordinate", "yCoordinate", "size", "images"].map((field, index) => (
+              <Grid item xs={12} sm={6} key={index}>
+                <TextField
+                  fullWidth
+                  label={field.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
+                  name={field}
+                  value={formData[field]}
                   onChange={handleInputChange}
-                  placeholder={field.placeholder}
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    fontSize: "14px",
-                    borderRadius: "4px",
-                    border: "1px solid #ccc",
-                    backgroundColor: "#fff",
-                  }}
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                  type={
+                    ["xCoordinate", "yCoordinate", "size"].includes(field) ? "number" : "text"
+                  }
                 />
               </Grid>
             ))}
           </Grid>
-
-          <Box display="flex" gap={2} mt={2}>
-            <button
+          <Box display="flex" justifyContent="center" gap={2} mt={3}>
+            <Button
+              variant="contained"
+              color="success"
               onClick={handleRegister}
-              className="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-700"
             >
-              Add New Field
-            </button>
-            <button
+              Add Field
+            </Button>
+            <Button
+              variant="contained"
+              color="success"
               onClick={handleUpdate}
-              className="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-700"
             >
-              Update
-            </button>
-            <button
+              Update Field
+            </Button>
+            <Button
+              variant="outlined"
+              color="error"
               onClick={resetForm}
-              className="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-700"
             >
               Clear
-            </button>
+            </Button>
           </Box>
-        </Box>
+        </CardContent>
+      </Card>
 
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                {["Field ID", "Field Name", "X Coordinate", "Y Coordinate", "Size", "Image", "Actions"].map((header) => (
-                  <TableCell key={header} align="center" style={{ fontWeight: "bold", backgroundColor: "#f5f5f5" }}>
-                    {header}
-                  </TableCell>
-                ))}
+      <TableContainer component={Paper} sx={{ mt: 4 }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              {["Field ID", "Field Name", "X Coordinate", "Y Coordinate", "Size", "Image", "Actions"].map((header) => (
+                <TableCell key={header} align="center" style={{ fontWeight: "bold", backgroundColor: "#f5f5f5" }}>
+                  {header}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {fieldsData.map((field) => (
+              <TableRow key={field._id}>
+                <TableCell align="center">{field.fieldID}</TableCell>
+                <TableCell align="center">{field.fieldName}</TableCell>
+                <TableCell align="center">{field.xCoordinate}</TableCell>
+                <TableCell align="center">{field.yCoordinate}</TableCell>
+                <TableCell align="center">{field.size}</TableCell>
+                <TableCell align="center">
+                  {field.images ? (
+                    <img
+                      src={field.images}
+                      alt={field.fieldName}
+                      style={{ width: "100px", height: "100px", objectFit: "cover", cursor: "pointer" }}
+                      onClick={() => handleImageClick(field.images)}
+                    />
+                  ) : (
+                    "No Image"
+                  )}
+                </TableCell>
+                <TableCell align="center">
+                  <IconButton onClick={() => setFormData({ ...field })}>
+                    <EditIcon color="primary" />
+                  </IconButton>
+                  <IconButton onClick={() => handleDelete(field._id)}>
+                    <DeleteIcon color="error" />
+                  </IconButton>
+                </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {fieldsData.map((field) => (
-                <TableRow key={field._id}>
-                  <TableCell align="center">{field.fieldID}</TableCell>
-                  <TableCell align="center">{field.fieldName}</TableCell>
-                  <TableCell align="center">{field.xCoordinate}</TableCell>
-                  <TableCell align="center">{field.yCoordinate}</TableCell>
-                  <TableCell align="center">{field.size}</TableCell>
-                  <TableCell align="center">
-                    {field.images ? (
-                      <img
-                        src={field.images}
-                        alt={field.fieldName}
-                        style={{ width: "100px", height: "100px", objectFit: "cover" }}
-                      />
-                    ) : (
-                      "No Image"
-                    )}
-                  </TableCell>
-                  <TableCell align="center">
-                    <IconButton onClick={() => handleEdit(field)}>
-                      <EditIcon color="primary" />
-                    </IconButton>
-                    <IconButton onClick={() => handleDelete(field._id)}>
-                      <DeleteIcon color="error" />
-                    </IconButton>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={() => {
-                        setIsAssignModalOpen(true);
-                        setAssignData({ ...assignData, fieldID: field.fieldID });
-                      }}
-                    >
-                      Assign Staff
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-        <Modal open={isAssignModalOpen} onClose={() => setIsAssignModalOpen(false)}>
-          <Box
-            p={4}
-            style={{
-              backgroundColor: "#fff",
-              margin: "auto",
-              marginTop: "10%",
-              width: "400px",
-              borderRadius: "8px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-            }}
-          >
-            <Typography variant="h6" mb={3}>
-              Assign Staff Member
-            </Typography>
-            <TextField
-              label="Date"
-              type="date"
-              fullWidth
-              value={assignData.date}
-              onChange={(e) => setAssignData({ ...assignData, date: e.target.value })}
-              InputLabelProps={{ shrink: true }}
-              sx={{ mb: 2 }}
+      <Modal open={modalOpen} onClose={handleModalClose}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+          }}
+        >
+          {selectedImage && (
+            <img
+              src={selectedImage}
+              alt="Large view"
+              style={{ width: "100%", height: "auto" }}
             />
-            <TextField
-              label="Field ID"
-              fullWidth
-              value={assignData.fieldID}
-              InputProps={{ readOnly: true }}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              select
-              label="Staff Member"
-              fullWidth
-              value={assignData.staffMember}
-              onChange={(e) => setAssignData({ ...assignData, staffMember: e.target.value })}
-              sx={{ mb: 2 }}
-            >
-              {staffMembers.map((staff) => (
-                <MenuItem key={staff.id} value={staff.id}>
-                  {staff.firstName}
-                </MenuItem>
-              ))}
-            </TextField>
+          )}
+        </Box>
+      </Modal>
 
-            <Box display="flex" gap={2}>
-              <Button variant="contained" color="primary" onClick={handleAssign}>
-                Confirm
-              </Button>
-              <Button variant="outlined" color="secondary" onClick={() => setIsAssignModalOpen(false)}>
-                Cancel
-              </Button>
-            </Box>
-          </Box>
-        </Modal>
-      </Box>
-    </div>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 };
 

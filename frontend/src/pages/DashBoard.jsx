@@ -21,7 +21,7 @@ const Dashboard = () => {
       {
         label: "Field Sizes (acres)",
         data: [],
-        backgroundColor: "#42a5f5",
+        backgroundColor: [],
       },
     ],
   });
@@ -40,6 +40,7 @@ const Dashboard = () => {
   });
 
   const [crops, setCrops] = useState([]);
+  const [staffs, setStaffs] = useState([]);
 
   useEffect(() => {
     const fetchFieldData = async () => {
@@ -50,24 +51,26 @@ const Dashboard = () => {
         const labels = data.map((field) => field.fieldName);
         const sizes = data.map((field) => field.size);
 
+        // Alternate bar colors
+        const barColors = sizes.map((_, index) =>
+          index % 2 === 0 ? "#93C572" : "#B4C424"
+        );
+
         setBarChartData({
           labels,
           datasets: [
             {
               label: "Field Sizes (acres)",
               data: sizes,
-              backgroundColor: "#42a5f5",
+              backgroundColor: barColors,
             },
           ],
         });
 
-        // Set the total fields and the staff count (you can replace it with real data)
-        setCardData({
+        setCardData((prevState) => ({
+          ...prevState,
           totalFields: data.length,
-          totalCrops: crops.length, // Set crops length dynamically
-          totalStaff: 20, // Assuming static number for now
-          availableVehicles: 2, // Replace with real data if available
-        });
+        }));
       } catch (error) {
         console.error("Error fetching field data:", error);
       }
@@ -75,22 +78,16 @@ const Dashboard = () => {
 
     const fetchWeatherData = async () => {
       try {
-        const apiKey = process.env.REACT_APP_GOOGLE_API_KEY;
-        const searchEngineId = process.env.REACT_APP_SEARCH_ENGINE_ID;
-
-        const query = "current weather in Malabe";
-
+        const apiKey = process.env.REACT_APP_OPENWEATHER_API_KEY;
+        const city = "Malabe";
         const response = await fetch(
-          `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngineId}&q=${query}`
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
         );
         const data = await response.json();
 
-        const snippet = data.items[0].snippet;
-        const [condition, temperature] = snippet.split(", ");
-
         setWeatherData({
-          temperature: temperature || "N/A",
-          condition: condition || "N/A",
+          temperature: `${data.main.temp}°C`,
+          condition: data.weather[0].description,
           time: new Date().toLocaleTimeString(),
         });
       } catch (error) {
@@ -103,7 +100,7 @@ const Dashboard = () => {
         const response = await fetch("http://localhost:5000/api/crops");
         const data = await response.json();
         setCrops(data);
-        // Update the total crops dynamically when crops data is fetched
+
         setCardData((prevState) => ({
           ...prevState,
           totalCrops: data.length,
@@ -112,10 +109,25 @@ const Dashboard = () => {
         console.error("Error fetching crop data:", error);
       }
     };
+    const fetchstaffData = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/staffs");
+        const data = await response.json();
+        setStaffs(data);
+
+        setCardData((prevState) => ({
+          ...prevState,
+          totalStaffs: data.length,
+        }));
+      } catch (error) {
+        console.error("Error fetching staff data:", error);
+      }
+    };
 
     fetchFieldData();
     fetchWeatherData();
     fetchCropData();
+    fetchstaffData();
 
     const timeInterval = setInterval(() => {
       setWeatherData((prev) => ({
@@ -125,7 +137,7 @@ const Dashboard = () => {
     }, 1000);
 
     return () => clearInterval(timeInterval);
-  }, [crops.length]);
+  }, []);
 
   const barChartOptions = {
     responsive: true,

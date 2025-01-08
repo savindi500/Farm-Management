@@ -54,7 +54,7 @@ const LoginPage = () => {
         <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8">
           <div className="w-full max-w-md">
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-green-900"> Harvest Haven</h1>
+              <h1 className="text-3xl font-bold text-green-900"> Agrimo</h1>
               <p className="mt-2 text-gray-500">Let’s Make Magic Happen</p>
             </div>
             <Box display="flex" justifyContent="center" gap={2} mb={3}>

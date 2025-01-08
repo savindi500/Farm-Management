@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Snackbar, Alert } from "@mui/material";
 import axios from "axios";
 import {
   Box,
@@ -15,7 +16,8 @@ import {
   Grid,
   RadioGroup,
   FormControlLabel,
-  Radio,
+  Radio
+  
 } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 
@@ -32,9 +34,9 @@ function Staff() {
     joinedDate: "",
     dob: "",
   });
-
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [staffData, setStaffData] = useState([]);
-
+  
   useEffect(() => {
     fetchStaff();
   }, []);
@@ -44,7 +46,7 @@ function Staff() {
       const response = await axios.get("http://localhost:5000/api/staffs");
       setStaffData(response.data);
     } catch (error) {
-      console.error("Error fetching staff data", error);
+      showSnackbar("Error fetching staff. Please try again.", "error");
     }
   };
 
@@ -52,21 +54,11 @@ function Staff() {
     try {
       const response = await axios.post("http://localhost:5000/api/staffs", formData);
       setStaffData([...staffData, response.data]);
-      setFormData({
-        _id: "",
-        firstName: "",
-        email: "",
-        contact: "",
-        designation: "",
-        role: "",
-        address: "",
-        gender: "",
-        joinedDate: "",
-        dob: "",
-      });
       clearForm();
+      showSnackbar("Crop added successfully!", "success");
     } catch (error) {
       console.error("Error registering staff", error);
+      showSnackbar("Error adding crop. Please try again.", "error");
     }
   };
 
@@ -79,8 +71,10 @@ function Staff() {
       await axios.put(`http://localhost:5000/api/staffs/${formData._id}`, formData);
       fetchStaff();
       clearForm();
+      showSnackbar("Crop updated successfully!", "success");
     } catch (error) {
       console.error("Error updating staff", error);
+      showSnackbar("Error updating crop. Please try again.", "error");
     }
   };
 
@@ -88,8 +82,10 @@ function Staff() {
     try {
       await axios.delete(`http://localhost:5000/api/staffs/${id}`);
       setStaffData(staffData.filter((staff) => staff._id !== id));
+      showSnackbar("Crop updated successfully!", "success");
     } catch (error) {
       console.error("Error deleting staff", error);
+      showSnackbar("Error updating crop. Please try again.", "error");
     }
   };
 
@@ -121,27 +117,27 @@ function Staff() {
     });
   };
 
-  return (
-    <div className="min-h-screen ">
-      <Box p={4}>
-        <Typography variant="h5" mb={3} fontWeight="bold">
-          Staff
-        </Typography>
+  const showSnackbar = (message, severity) => {
+    setSnackbar({ open: true, message, severity });
+  };
 
-        <Box component="form" mb={4}>
+  const closeSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  return (
+    <div className="min-h-screen">
+      <Box p={4}>
+      <h2 className="text-2xl font-bold text-center mb-6">Staff Management</h2>
+
+
+        <Box component="form" mb={4} p={3} bgcolor="#f9f9f9" borderRadius="8px">
           <Grid container spacing={2}>
-            {[
-              { label: "First Name", name: "firstName", type: "text", placeholder: "First name" },
-              { label: "Email", name: "email", type: "email", placeholder: "Email" },
-              { label: "Contact", name: "contact", type: "text", placeholder: "Contact" },
-              { label: "Designation", name: "designation", type: "select", placeholder: "Designation", options: ["Manager", "Developer", "Designer"] },
-              { label: "Role", name: "role", type: "select", placeholder: "Role", options: ["Admin", "User", "Editor"] },
-              { label: "Address", name: "address", type: "text", placeholder: "Address" },
-              { label: "Joined Date", name: "joinedDate", type: "date", placeholder: "Joined date" },
-              { label: "Date of Birth", name: "dob", type: "date", placeholder: "Date of birth" },
-            ].map((field) => (
+            {[{ label: "First Name", name: "firstName", type: "text" }, { label: "Email", name: "email", type: "email" }, { label: "Contact", name: "contact", type: "text" }, { label: "Designation", name: "designation", type: "select", options: ["Field Supervisor", "Crop Specialist", "Laborer"] }, { label: "Role", name: "role", type: "select", options: ["Admin", "User", "Editor"] }, { label: "Address", name: "address", type: "text" }, { label: "Joined Date", name: "joinedDate", type: "date" }, { label: "Date of Birth", name: "dob", type: "date" }].map((field) => (
               <Grid item xs={12} sm={6} key={field.name}>
-                <label style={{ display: "block", marginBottom: "8px" }}>{field.label}</label>
+                <Typography variant="body1" mb={1}>
+                  {field.label}
+                </Typography>
                 {field.type === "select" ? (
                   <select
                     name={field.name}
@@ -149,18 +145,17 @@ function Staff() {
                     onChange={handleInputChange}
                     style={{
                       width: "100%",
-                      padding: "8px",
-                      fontSize: "14px",
-                      borderRadius: "4px",
+                      padding: "10px",
+                      borderRadius: "6px",
                       border: "1px solid #ccc",
-                      backgroundColor: "#fff",
+                      fontSize: "16px",
                     }}
                   >
                     <option value="" disabled>
-                      {field.placeholder}
+                      Select {field.label}
                     </option>
-                    {field.options.map((option, index) => (
-                      <option key={index} value={option}>
+                    {field.options.map((option) => (
+                      <option key={option} value={option}>
                         {option}
                       </option>
                     ))}
@@ -171,21 +166,23 @@ function Staff() {
                     name={field.name}
                     value={formData[field.name]}
                     onChange={handleInputChange}
-                    placeholder={field.placeholder}
+                    placeholder={`Enter ${field.label}`}
                     style={{
                       width: "100%",
-                      padding: "8px",
-                      fontSize: "14px",
-                      borderRadius: "4px",
+                      padding: "10px",
+                      borderRadius: "6px",
                       border: "1px solid #ccc",
-                      backgroundColor: "#fff",
+                      fontSize: "16px",
                     }}
                   />
                 )}
               </Grid>
             ))}
+
             <Grid item xs={12}>
-              <label style={{ display: "block", marginBottom: "8px" }}>Gender</label>
+              <Typography variant="body1" mb={1}>
+                Gender
+              </Typography>
               <RadioGroup row value={formData.gender} onChange={handleGenderChange}>
                 <FormControlLabel value="Male" control={<Radio />} label="Male" />
                 <FormControlLabel value="Female" control={<Radio />} label="Female" />
@@ -193,33 +190,58 @@ function Staff() {
               </RadioGroup>
             </Grid>
           </Grid>
-          <Box display="flex" gap={2} mt={2}>
-            <Button variant="contained"  onClick={handleRegister} sx={{ textTransform: "capitalize" }}>
+
+          <Box display="flex" justifyContent="center" gap={2} mt={4}>
+            <Button
+              variant="contained"
+              onClick={handleRegister}
+              sx={{
+                backgroundColor: "green",
+                color: "white",
+                "&:hover": { backgroundColor: "darkgreen" },
+              }}
+            >
               Register
             </Button>
-            <Button variant="contained" color="primary" onClick={handleUpdate} sx={{ textTransform: "capitalize" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleUpdate}
+              sx={{
+                backgroundColor: "green",
+                color: "white",
+                "&:hover": { backgroundColor: "darkgreen" },
+              }}
+            >
               Update
             </Button>
-            <Button variant="outlined" onClick={clearForm} sx={{ textTransform: "capitalize" }}>
+            <Button variant="outlined" onClick={clearForm}
+             sx={{
+              backgroundColor: "green",
+              color: "white",
+              "&:hover": { backgroundColor: "darkgreen" },
+            }}>
               Clear
             </Button>
           </Box>
         </Box>
 
         <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }}>
+          <Table>
             <TableHead>
               <TableRow>
-                {["First Name", "Email", "Contact", "Designation", "Role", "Address", "Gender", "Join Date", "Date of Birth", "Actions"].map((header) => (
-                  <TableCell key={header} align="center" style={{ fontWeight: "bold", backgroundColor: "#f5f5f5" }}>
-                    {header}
-                  </TableCell>
-                ))}
+                {["First Name", "Email", "Contact", "Designation", "Role", "Address", "Gender", "Join Date", "DOB", "Actions"].map(
+                  (header) => (
+                    <TableCell key={header} align="center" sx={{ fontWeight: "bold", backgroundColor: "#f0f0f0" }}>
+                      {header}
+                    </TableCell>
+                  )
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
-              {staffData.map((staff, index) => (
-                <TableRow key={staff._id} style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#ffffff" }}>
+              {staffData.map((staff) => (
+                <TableRow key={staff._id}>
                   <TableCell align="center">{staff.firstName}</TableCell>
                   <TableCell align="center">{staff.email}</TableCell>
                   <TableCell align="center">{staff.contact}</TableCell>
@@ -230,10 +252,10 @@ function Staff() {
                   <TableCell align="center">{new Date(staff.joinedDate).toLocaleDateString()}</TableCell>
                   <TableCell align="center">{new Date(staff.dob).toLocaleDateString()}</TableCell>
                   <TableCell align="center">
-                    <IconButton color="primary" onClick={() => handleEdit(staff)} title="Edit">
+                    <IconButton color="primary" onClick={() => handleEdit(staff)}>
                       <EditIcon />
                     </IconButton>
-                    <IconButton color="error" onClick={() => handleDelete(staff._id)} title="Delete">
+                    <IconButton color="error" onClick={() => handleDelete(staff._id)}>
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>
@@ -243,6 +265,18 @@ function Staff() {
           </Table>
         </TableContainer>
       </Box>
+
+     {/* Snackbar Component */}
+             <Snackbar
+               open={snackbar.open}
+               autoHideDuration={4000}
+               onClose={closeSnackbar}
+               anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+             >
+               <Alert onClose={closeSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
+                 {snackbar.message}
+               </Alert>
+             </Snackbar>
     </div>
   );
 }

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Snackbar, Alert } from "@mui/material";
 
 const Crops = () => {
   const [crops, setCrops] = useState([]);
   const [newCrop, setNewCrop] = useState({ cropId: "", commonName: "", specificName: "", cropseason: "", image: "" });
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   useEffect(() => {
     fetchCrops();
@@ -14,7 +16,7 @@ const Crops = () => {
       const response = await axios.get("http://localhost:5000/api/crops");
       setCrops(response.data);
     } catch (error) {
-      console.error("Error fetching crops:", error);
+      showSnackbar("Error fetching crops. Please try again.", "error");
     }
   };
 
@@ -23,18 +25,20 @@ const Crops = () => {
       const response = await axios.post("http://localhost:5000/api/crops", newCrop);
       setCrops([...crops, response.data]);
       setNewCrop({ cropId: "", commonName: "", specificName: "", cropseason: "", image: "" });
+      showSnackbar("Crop added successfully!", "success");
     } catch (error) {
-      console.error("Error adding crop:", error);
+      showSnackbar("Error adding crop. Please try again.", "error");
     }
   };
 
   const handleUpdateCrop = async () => {
     try {
       const response = await axios.put(`http://localhost:5000/api/crops/${newCrop.cropId}`, newCrop);
-      setCrops(crops.map(crop => crop._id === newCrop.cropId ? response.data : crop));
+      setCrops(crops.map((crop) => (crop._id === newCrop.cropId ? response.data : crop)));
       setNewCrop({ cropId: "", commonName: "", specificName: "", cropseason: "", image: "" });
+      showSnackbar("Crop updated successfully!", "success");
     } catch (error) {
-      console.error("Error updating crop:", error);
+      showSnackbar("Error updating crop. Please try again.", "error");
     }
   };
 
@@ -42,8 +46,9 @@ const Crops = () => {
     try {
       await axios.delete(`http://localhost:5000/api/crops/${id}`);
       setCrops(crops.filter((crop) => crop._id !== id));
+      showSnackbar("Crop deleted successfully!", "success");
     } catch (error) {
-      console.error("Error deleting crop:", error);
+      showSnackbar("Error deleting crop. Please try again.", "error");
     }
   };
 
@@ -57,124 +62,113 @@ const Crops = () => {
     });
   };
 
+  const showSnackbar = (message, severity) => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const closeSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
   return (
-    <div className="min-h-screen bg-green-70">
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold">Crops</h2>
-          <div className="space-x-2">
-            <button
-              onClick={handleAddCrop}
-              className="bg-green-900 text-white px-4 py-2 rounded hover:bg-green-700"
-              
-            >
-              Add New Crop
-            </button>
-            {newCrop.cropId && (
-              <button
-                onClick={handleUpdateCrop}
-                className="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-700"
-              >
-                Update Crop
-              </button>
-            )}
-          </div>
-        </div>
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold text-center mb-6">Crop Management </h2>
+
+        {/* Snackbar Component */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={4000}
+          onClose={closeSnackbar}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert onClose={closeSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
 
         {/* Add/Update Crop Form */}
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-          <div>
-            <label className="block font-medium text-gray-700 mb-1">Crop ID</label>
-            <input
-              type="text"
-              placeholder="Crop ID"
-              value={newCrop.cropId}
-              onChange={(e) => setNewCrop({ ...newCrop, cropId: e.target.value })}
-              className="border px-3 py-2 w-full"
-            />
-          </div>
-          <div>
-            <label className="block font-medium text-gray-700 mb-1">Common Name</label>
-            <input
-              type="text"
-              placeholder="Common Name"
-              value={newCrop.commonName}
-              onChange={(e) => setNewCrop({ ...newCrop, commonName: e.target.value })}
-              className="border px-3 py-2 w-full"
-            />
-          </div>
-          <div>
-            <label className="block font-medium text-gray-700 mb-1">Specific Name</label>
-            <input
-              type="text"
-              placeholder="Specific Name"
-              value={newCrop.specificName}
-              onChange={(e) => setNewCrop({ ...newCrop, specificName: e.target.value })}
-              className="border px-3 py-2 w-full"
-            />
-          </div>
-          <div>
-            <label className="block font-medium text-gray-700 mb-1">Crop Season</label>
-            <input
-              type="text"
-              placeholder="Crop Season"
-              value={newCrop.cropseason}
-              onChange={(e) => setNewCrop({ ...newCrop, cropseason: e.target.value })}
-              className="border px-3 py-2 w-full"
-            />
-          </div>
-          <div>
-            <label className="block font-medium text-gray-700 mb-1">Image URL</label>
-            <input
-              type="text"
-              placeholder="Image URL"
-              value={newCrop.image}
-              onChange={(e) => setNewCrop({ ...newCrop, image: e.target.value })}
-              className="border px-3 py-2 w-full"
-            />
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+          {[{ label: "Crop ID", value: newCrop.cropId, key: "cropId" },
+            { label: "Common Name", value: newCrop.commonName, key: "commonName" },
+            { label: "Specific Name", value: newCrop.specificName, key: "specificName" },
+            { label: "Crop Season", value: newCrop.cropseason, key: "cropseason" },
+            { label: "Image URL", value: newCrop.image, key: "image" },
+          ].map(({ label, value, key }) => (
+            <div key={key}>
+              <label className="block text-gray-700 font-medium mb-2">{label}</label>
+              <input
+                type="text"
+                value={value}
+                onChange={(e) => setNewCrop({ ...newCrop, [key]: e.target.value })}
+                className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-green-500"
+                placeholder={`Enter ${label}`}
+              />
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-center space-x-4 mb-6">
+          <button
+            onClick={handleAddCrop}
+            className="bg-green-900 text-white px-6 py-2 rounded-lg hover:bg-green-600 shadow-md"
+          >
+            Add Crop
+          </button>
+          {newCrop.cropId && (
+            <button
+              onClick={handleUpdateCrop}
+              className="bg-green-900 text-white px-6 py-2 rounded-lg hover:bg-green-600 shadow-md"
+            >
+              Update Crop
+            </button>
+          )}
         </div>
 
         {/* Crops Table */}
-        <div className="overflow-x-auto bg-white rounded shadow-md">
-          <table className="min-w-full text-left">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-200">
-                <th className="px-4 py-2">Crop ID</th>
-                <th className="px-4 py-2">Common Name</th>
-                <th className="px-4 py-2">Specific Name</th>
-                <th className="px-4 py-2">Crop Season</th>
-                <th className="px-4 py-2">Image</th>
-                <th className="px-4 py-2">Actions</th>
+                {["Crop ID", "Common Name", "Specific Name", "Crop Season", "Image", "Actions"].map((header) => (
+                  <th key={header} className="px-4 py-3 border-b border-gray-300 font-medium">
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {crops.map((crop) => (
-                <tr key={crop._id} className="border-t">
-                  <td className="px-4 py-2">{crop.cropId}</td>
-                  <td className="px-4 py-2">{crop.commonName}</td>
-                  <td className="px-4 py-2">{crop.specificName}</td>
-                  <td className="px-4 py-2">{crop.cropseason}</td>
-                  <td className="px-4 py-2">
+                <tr key={crop._id} className="odd:bg-white even:bg-gray-50">
+                  <td className="px-4 py-3 border-b border-gray-300">{crop.cropId}</td>
+                  <td className="px-4 py-3 border-b border-gray-300">{crop.commonName}</td>
+                  <td className="px-4 py-3 border-b border-gray-300">{crop.specificName}</td>
+                  <td className="px-4 py-3 border-b border-gray-300">{crop.cropseason}</td>
+                  <td className="px-4 py-3 border-b border-gray-300">
                     {crop.image ? (
-                      <img src={crop.image} alt={crop.commonName} className="w-32 h-32 object-cover rounded" />
+                      <img
+                        src={crop.image}
+                        alt={crop.commonName}
+                        className="w-16 h-16 object-cover rounded-full"
+                      />
                     ) : (
-                      <span>No Image</span>
+                      <span className="text-gray-500 italic">No Image</span>
                     )}
                   </td>
-                  <td className="px-4 py-2 flex space-x-2">
-                    <button
-                      onClick={() => handleDeleteCrop(crop._id)}
-                      className="text-red-600 hover:underline"
-                    >
-                       Delete
-                    </button>
-                    <button
-                      onClick={() => handleEditCrop(crop)}
-                      className="text-blue-600 hover:underline"
-                    >
-                       Edit
-                    </button>
+                  <td className="px-4 py-3 border-b border-gray-300">
+                    <div className="flex space-x-4">
+                      <button
+                        onClick={() => handleEditCrop(crop)}
+                        className="text-blue-600 hover:underline"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteCrop(crop._id)}
+                        className="text-red-600 hover:underline"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

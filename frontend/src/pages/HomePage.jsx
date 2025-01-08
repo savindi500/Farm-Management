@@ -1,16 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button, Container, Grid, Box, Card, CardMedia, CardContent } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Container, Grid, Box, Card, CardMedia, CardContent, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import { Fade, Slide } from 'react-awesome-reveal';
 
 const HomePage = () => {
   return (
     <div>
       {/* Header Section */}
-      <AppBar position="static" sx={{ backgroundColor: '#6b8e23' }}>
+      <AppBar position="static" sx={{ backgroundColor: '#B4C424' }}>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
             Agrimo
@@ -37,7 +39,32 @@ const HomePage = () => {
           textAlign: 'center',
         }}
       >
-        
+        <Fade>
+          <Typography variant="h3" fontWeight="bold">Welcome to Agrimo</Typography>
+          <Typography variant="h6" mt={2}>
+            Revolutionizing Agriculture for a Better Tomorrow
+          </Typography>
+          <Button
+            variant="contained"
+            sx={{ mt: 4, backgroundColor: '#fff', color: '#6b8e23', fontWeight: 'bold' }}
+          >
+            Learn More
+          </Button>
+        </Fade>
+      </Box>
+
+      {/* About Us Section */}
+      <Box sx={{ py: 6, backgroundColor: '#f0f8ff' }}>
+        <Container>
+          <Slide direction="left">
+            <Typography variant="h4" fontWeight="bold" align="center" gutterBottom>
+              About Us
+            </Typography>
+            <Typography variant="body1" align="center" sx={{ maxWidth: '800px', mx: 'auto', mb: 4 }}>
+              Agrimo is dedicated to enhancing agricultural productivity through innovative solutions and sustainable practices. We strive to create a positive impact on farmers and communities worldwide.
+            </Typography>
+          </Slide>
+        </Container>
       </Box>
 
       {/* Services Section */}
@@ -51,7 +78,11 @@ const HomePage = () => {
               <Card sx={{ textAlign: 'center', padding: 2 }}>
                 <CardMedia
                   component="img"
-                  height="200"
+                  sx={{
+                    height: 200,
+                    width: '100%',
+                    objectFit: 'cover', // Ensures images cover the area without distortion
+                  }}
                   image={service.image}
                   alt={service.title}
                 />
@@ -69,28 +100,30 @@ const HomePage = () => {
         </Grid>
       </Container>
 
-      {/* Products Section */}
-      <Box sx={{ backgroundColor: '#f8f9fa', py: 6 }}>
+      {/* Latest News Section */}
+      <Box sx={{ py: 6, backgroundColor: '#fafafa' }}>
         <Container>
           <Typography variant="h4" fontWeight="bold" align="center" gutterBottom>
-            Choose What’s Perfect for Your Field
+            Latest News
           </Typography>
           <Grid container spacing={4}>
-            {products.map((product, index) => (
+            {news.map((item, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
-                <Card sx={{ textAlign: 'center', padding: 2 }}>
+                <Card>
                   <CardMedia
                     component="img"
-                    height="200"
-                    image={product.image}
-                    alt={product.name}
+                    sx={{
+                      height: 200,
+                      width: '100%',
+                      objectFit: 'cover',
+                    }}
+                    image={item.image}
+                    alt={item.title}
                   />
                   <CardContent>
-                    <Typography variant="h6" fontWeight="bold">
-                      {product.name}
-                    </Typography>
+                    <Typography variant="h6" fontWeight="bold">{item.title}</Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {product.description}
+                      {item.description}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -100,118 +133,90 @@ const HomePage = () => {
         </Container>
       </Box>
 
-      {/* Testimonials Section */}
+      {/* FAQ Section */}
       <Container sx={{ py: 6 }}>
         <Typography variant="h4" fontWeight="bold" align="center" gutterBottom>
-          What Our Customers Say
+          Frequently Asked Questions
         </Typography>
-        <Grid container spacing={4}>
-          {testimonials.map((testimonial, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <Card sx={{ padding: 2 }}>
-                <CardContent>
-                  <Typography variant="body1" color="text.secondary">
-                    “{testimonial.text}”
-                  </Typography>
-                  <Typography variant="subtitle2" fontWeight="bold" sx={{ mt: 2 }}>
-                    - {testimonial.author}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        {faq.map((item, index) => (
+          <Accordion key={index}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6">{item.question}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography>{item.answer}</Typography>
+            </AccordionDetails>
+          </Accordion>
+        ))}
       </Container>
 
-      {/* Footer Section */}
-<Box sx={{ backgroundColor: '#6b8e23', color: '#fff', py: 6 }}>
-  <Container>
-    <Grid container spacing={4}>
-      {/* About Section */}
-      <Grid item xs={12} md={4}>
-        <Typography variant="h6" fontWeight="bold" gutterBottom>
-          🌿 About Agrimo
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ color: '#f5f5f5' }}>
-          🌱 Agrimo is a modern, professional theme designed to help your business thrive 🌟 and stand out from the crowd.
-        </Typography>
-      </Grid>
-
-      {/* Quick Links */}
-      <Grid item xs={12} md={4}>
-        <Typography variant="h6" fontWeight="bold" gutterBottom>
-          🚀 Quick Links
-        </Typography>
-        <Typography variant="body2" component="ul" sx={{ listStyle: 'none', pl: 0 }}>
-          <li>🔗 <a href="/home" style={{ color: '#fff', textDecoration: 'none' }}>Home</a></li>
-          <li>🌾 <a href="/services" style={{ color: '#fff', textDecoration: 'none' }}>Services</a></li>
-          <li>📜 <a href="/dashboard" style={{ color: '#fff', textDecoration: 'none' }}>Dashboard</a></li>
-          <li>📧 <a href="/contact" style={{ color: '#fff', textDecoration: 'none' }}>Contact</a></li>
-        </Typography>
-      </Grid>
-
-      {/* Contact Us */}
-      <Grid item xs={12} md={4}>
-        <Typography variant="h6" fontWeight="bold" gutterBottom>
-          📞 Contact Us
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ color: '#f5f5f5' }}>
-          ✉️ Email: <a href="mailto:info@agrimo.com" style={{ color: '#fff', textDecoration: 'none' }}>info@agrimo.com</a>
-          <br />
-          📱 Phone: <a href="tel:+1234567890" style={{ color: '#fff', textDecoration: 'none' }}>+1 234 567 890</a>
-        </Typography>
-      </Grid>
-    </Grid>
-
-    {/* Social Media Links */}
-    <Box sx={{ textAlign: 'center', mt: 4 }}>
-      <Typography variant="h6" fontWeight="bold" gutterBottom>
-        🌐 Follow Us
-      </Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, fontSize: '1.5rem' }}>
-        <a href="https://facebook.com" style={{ color: '#fff' }}>
-          <FacebookIcon />
-        </a>
-        <a href="https://twitter.com" style={{ color: '#fff' }}>
-          <TwitterIcon />
-        </a>
-        <a href="https://instagram.com" style={{ color: '#fff' }}>
-          <InstagramIcon />
-        </a>
-        <a href="https://linkedin.com" style={{ color: '#fff' }}>
-          <LinkedInIcon />
-        </a>
+      {/* Footer */}
+      <Box sx={{ py: 4, backgroundColor: '#B4C424', color: '#fff', mt: 4 }}>
+        <Container>
+          <Grid container spacing={4}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Typography variant="h6" fontWeight="bold" gutterBottom>
+                Agrimo
+              </Typography>
+              <Typography variant="body2">
+                Revolutionizing Agriculture for a Better Tomorrow.
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Typography variant="h6" fontWeight="bold" gutterBottom>
+                Quick Links
+              </Typography>
+              <Typography variant="body2">Home</Typography>
+              <Typography variant="body2">Dashboard</Typography>
+              <Typography variant="body2">Services</Typography>
+              <Typography variant="body2">Contact</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Typography variant="h6" fontWeight="bold" gutterBottom>
+                Follow Us
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <FacebookIcon />
+                <TwitterIcon />
+                <InstagramIcon />
+                <LinkedInIcon />
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Typography variant="h6" fontWeight="bold" gutterBottom>
+                Contact Us
+              </Typography>
+              <Typography variant="body2">info@agrimo.com</Typography>
+              <Typography variant="body2">+1 234 567 890</Typography>
+            </Grid>
+          </Grid>
+          <Box sx={{ textAlign: 'center', mt: 4 }}>
+            <Typography variant="body2">
+              &copy; {new Date().getFullYear()} Agrimo. All Rights Reserved.
+            </Typography>
+          </Box>
+        </Container>
       </Box>
-    </Box>
-
-    {/* Footer Text */}
-    <Typography variant="body2" align="center" sx={{ mt: 4 }}>
-      &copy; {new Date().getFullYear()} Agrimo 🌾 All rights reserved.
-    </Typography>
-  </Container>
-</Box>
-
-
     </div>
   );
 };
 
 const services = [
-  { title: 'Harvest Excellence', description: 'Efficient and reliable crop harvesting.', image: 'https://images.pexels.com/photos/1486976/pexels-photo-1486976.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
-  { title: 'Farming Research', description: 'Innovative farming solutions.', image: 'https://img.freepik.com/free-photo/female-biotechnologist-inspecting-potted-plants-plant-nursery-writing-notes-into-clipboard_637285-1682.jpg?t=st=1736237807~exp=1736241407~hmac=be243249ee27798a4e6fe77c35a8c244665fad9dfa76e9baf1890609c463be1c&w=996' },
-  { title: 'Soil Conservation', description: 'Protect and preserve soil health.', image: 'https://img.freepik.com/free-photo/top-view-gardener-planting_23-2148200478.jpg?t=st=1736237943~exp=1736241543~hmac=74d40710eea767c15afc7971321958243595f640eddd6a168084798cf4ddd371&w=996' },
+  { title: 'Harvest Excellence', description: 'Efficient and reliable crop harvesting.', image: 'https://images.pexels.com/photos/1486976/pexels-photo-1486976.jpeg' },
+  { title: 'Farming Research', description: 'Innovative farming solutions.', image: 'https://i.pinimg.com/736x/d1/22/b2/d122b250ced35523ad6961b84b238b6b.jpg' },
+  { title: 'Soil Conservation', description: 'Protect and preserve soil health.', image: 'https://img.freepik.com/free-photo/growing-life-concept-with-flowers_23-2149243611.jpg?t=st=1736344213~exp=1736347813~hmac=d48fe905a4b7e5726999a217761e62ca3d76035ec69e8868cf135a13bbfc8e8a&w=360' },
 ];
 
-const products = [
-  { name: 'Organic Corn', description: 'High-quality organic corn.', image: 'https://media.istockphoto.com/id/1485792634/photo/ripe-yellow-corn-cob-on-the-field.jpg?s=2048x2048&w=is&k=20&c=31l1Ff2Yde_evbYwI7fcTtTBwvGnmrIMJso-d4syIrg=' },
-  { name: 'Fresh Vegetables', description: 'From farm to table.', image: 'https://images.unsplash.com/photo-1570142056130-9f6b59c6287a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-  { name: 'Quality Fruits', description: 'Juicy and ripe fruits.', image: 'https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+const news = [
+  { title: 'Agriculture Trends 2025', description: 'Stay updated with the latest trends.', image: 'https://img.freepik.com/free-photo/farming-concept-with-pumpkin-goats_23-2149629531.jpg?t=st=1736344335~exp=1736347935~hmac=b6f9636ab4b5364826f3e5b3dfadad76a06accd3fece646d42e97f58adde7607&w=740' },
+  { title: 'Innovative Tools for Farmers', description: 'Discover cutting-edge technology.', image: 'https://img.freepik.com/free-photo/futuristic-technology-concept_23-2151908084.jpg?t=st=1736344457~exp=1736348057~hmac=5caf4b0ccac3728ec8a7884c9695c21e03dbee849af6d8a75e0efac34fcba750&w=900' },
+  { title: 'Global Farming Practices', description: 'Learn from the best practices globally.', image: 'https://media.istockphoto.com/id/2041616190/photo/autonomous-agriculture-vehicle-and-drone-are-working-in-agricultural-plot-agriculture.jpg?s=2048x2048&w=is&k=20&c=iRdabNr8ybcw4zDOEUTQPu9XlmzcPswnxfjsqwDr_9k=' },
 ];
 
-const testimonials = [
-  { text: 'Amazing quality and service!', author: 'Jane Doe' },
-  { text: 'The freshest produce I’ve ever had.', author: 'John Smith' },
-  { text: 'Highly recommend for organic food lovers.', author: 'Emily Brown' },
+const faq = [
+  { question: 'What services do you offer?', answer: 'We offer crop management, soil conservation, and more.' },
+  { question: 'How can I contact Agrimo?', answer: 'Reach us at info@agrimo.com or +1 234 567 890.' },
+  { question: 'Do you provide organic products?', answer: 'Yes, we offer a wide range of organic products.' },
 ];
 
 export default HomePage;
