@@ -33,10 +33,18 @@ Authentication: JWT (JSON Web Tokens)
 
 
 screenshots 
-![Screenshot 2025-01-07 165203](https://github.com/user-attachments/assets/db643652-bb2a-4ca1-97a9-92c38ccf7284)
-![Screenshot 2025-01-07 165027](https://github.com/user-attachments/assets/ba00a579-2ae3-4182-ad8d-f720334ed513)
-![Screenshot 2025-01-07 165106](https://github.com/user-attachments/assets/d076e724-70df-4365-abd8-f85ac85fe22d)
-![Screenshot 2025-01-07 165124](https://github.com/user-attachments/assets/7e15a52e-f271-41f7-82b5-d29596e05aa9)
+![Screenshot 2025-01-08 203233](https://github.com/user-attachments/assets/3f0505df-7026-4234-88a6-c0339b1033d7)
+![Screenshot 2025-01-08 203331](https://github.com/user-attachments/assets/ef1c3545-1c6a-4040-af77-3d2dab700b67)
+![Screenshot 2025-01-08 203401](https://github.com/user-attachments/assets/8eeb918f-3abf-4f13-922d-15e61e927787)
+![Screenshot 2025-01-08 203423](https://github.com/user-attachments/assets/b8bdebf5-f9c0-4e34-90c7-97b5068c7afb)
+![Screenshot 2025-01-08 203442](https://github.com/user-attachments/assets/afa994dc-378e-471a-adf5-090ac1893318)
+![Screenshot 2025-01-08 203503](https://github.com/user-attachments/assets/91f62321-f890-4d73-8319-f228ac391fbc)
+
+
+
+
+
+
 
 
 
