@@ -8,5 +8,5 @@ dotenv.config();
 
 export default defineConfig({
   plugins: [react()],
-  base: '/Farm-Management/', // Replace with your GitHub repository name
+ 
 });
